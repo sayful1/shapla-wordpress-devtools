@@ -1,17 +1,17 @@
 .form-tables-list {
-	// row-actions
-	.row-actions {
-		.view a {
-			background: url( "../img/list.svg" ) no-repeat scroll 0 0;
-			padding-left: 18px;
-		}
-		.empty a {
-			background: url( "../img/remove.svg" ) no-repeat scroll 0 0;
-			padding-left: 18px;
-		}
-		.drop a {
-			background: url( "../img/trash.svg" ) no-repeat scroll 0 0;
-			padding-left: 18px;
-		}
-	}
+  // row-actions
+  .row-actions {
+    .view a {
+      background: url("../img/list.svg") no-repeat scroll 0 0;
+      padding-left: 18px;
+    }
+    .empty a {
+      background: url("../img/remove.svg") no-repeat scroll 0 0;
+      padding-left: 18px;
+    }
+    .drop a {
+      background: url("../img/trash.svg") no-repeat scroll 0 0;
+      padding-left: 18px;
+    }
+  }
 }

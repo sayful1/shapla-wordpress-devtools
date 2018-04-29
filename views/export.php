@@ -2,15 +2,15 @@
 
 global $wpdb;
 
-$table 	= esc_attr( $_GET['table'] );
+$table = esc_attr( $_GET['table'] );
 
-$table_header 	= $wpdb->get_results("SHOW COLUMNS FROM $table FROM $wpdb->dbname;");
-$_header = array();
-foreach ($table_header as $_table_header) {
+$table_header = $wpdb->get_results( "SHOW COLUMNS FROM $table FROM $wpdb->dbname;" );
+$_header      = array();
+foreach ( $table_header as $_table_header ) {
 	$_header[] = $_table_header->Field;
 }
 
-$items = $wpdb->get_results("SELECT * FROM $table", ARRAY_N);
+$items = $wpdb->get_results( "SELECT * FROM $table", ARRAY_N );
 
 // var_dump( $items );
 
@@ -20,13 +20,13 @@ $items = $wpdb->get_results("SELECT * FROM $table", ARRAY_N);
 // header('Content-Disposition: attachment; filename=data.csv');
 
 // create a file pointer connected to the output stream
-$output = fopen('php://output', 'w');
+$output = fopen( 'php://output', 'w' );
 
 // output the column headings
-fputcsv( $output, $_header);
+fputcsv( $output, $_header );
 
-foreach ($items as $item) {
-	fputcsv( $output, $item);
+foreach ( $items as $item ) {
+	fputcsv( $output, $item );
 }
 
-fclose($output);
+fclose( $output );
