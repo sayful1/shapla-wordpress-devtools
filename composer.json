@@ -1,0 +1,23 @@
+{
+  "name": "sayful/wordpress-database-admin",
+  "description": "WordPress development tools",
+  "type": "project",
+  "license": "GPL2",
+  "authors": [
+    {
+      "name": "Sayful Islam",
+      "email": "sayful.islam001@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.0",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Shapla\\Devtools\\": "includes",
+      "Shapla\\Devtools\\Modules\\": "modules"
+    }
+  }
+}
