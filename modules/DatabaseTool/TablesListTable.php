@@ -38,19 +38,16 @@ class TablesListTable extends WP_List_Table {
 	 * @return array
 	 */
 	public function get_columns() {
-		$columns = array(
-			'cb'         => '<input type="checkbox"/>',
-			'table'      => __( 'Table', 'wordpress-database-admin' ),
-			'type'       => __( 'Type', 'wordpress-database-admin' ),
-			'collection' => __( 'Collection', 'wordpress-database-admin' ),
-			'rows'       => __( 'Rows', 'wordpress-database-admin' ),
-			'size'       => __( 'Size', 'wordpress-database-admin' ),
-			'actions'    => __( 'Actions', 'wordpress-database-admin' ),
+		return array(
+			'cb'              => '<input type="checkbox"/>',
+			'TABLE_NAME'      => __( 'Table', 'wordpress-database-admin' ),
+			'ENGINE'          => __( 'Type', 'wordpress-database-admin' ),
+			'TABLE_COLLATION' => __( 'Collection', 'wordpress-database-admin' ),
+			'TABLE_ROWS'      => __( 'Rows', 'wordpress-database-admin' ),
+			'size'            => __( 'Size', 'wordpress-database-admin' ),
+			'actions'         => __( 'Actions', 'wordpress-database-admin' ),
 		);
-
-		return $columns;
 	}
-
 
 	/**
 	 * Get sortable columns
@@ -59,7 +56,6 @@ class TablesListTable extends WP_List_Table {
 	public function get_sortable_columns() {
 		return array();
 	}
-
 
 	/**
 	 * Get column value
@@ -70,7 +66,15 @@ class TablesListTable extends WP_List_Table {
 	 * @return mixed
 	 */
 	public function column_default( $item, $column_name ) {
-		return isset( $item->{$column_name} ) ? esc_attr( $item->{$column_name} ) : null;
+		$value = null;
+		if ( is_array( $item ) && isset( $item[ $column_name ] ) ) {
+			$value = $item[ $column_name ];
+		}
+		if ( is_object( $item ) && isset( $item->{$column_name} ) ) {
+			$value = $item->{$column_name};
+		}
+
+		return $value;
 	}
 
 	/**
@@ -85,50 +89,6 @@ class TablesListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Get table name
-	 *
-	 * @param object $item
-	 *
-	 * @return string
-	 */
-	public function column_table( $item ) {
-		return esc_attr( $item->TABLE_NAME );
-	}
-
-	/**
-	 * Get database engine
-	 *
-	 * @param object $item
-	 *
-	 * @return string
-	 */
-	public function column_type( $item ) {
-		return esc_attr( $item->ENGINE );
-	}
-
-	/**
-	 * Get table collation
-	 *
-	 * @param object $item
-	 *
-	 * @return string
-	 */
-	public function column_collection( $item ) {
-		return esc_attr( $item->TABLE_COLLATION );
-	}
-
-	/**
-	 * Get table rows count
-	 *
-	 * @param object $item
-	 *
-	 * @return int
-	 */
-	public function column_rows( $item ) {
-		return intval( $item->TABLE_ROWS );
-	}
-
-	/**
 	 * Get column data size
 	 *
 	 * @param object $item
@@ -136,36 +96,7 @@ class TablesListTable extends WP_List_Table {
 	 * @return string
 	 */
 	public function column_size( $item ) {
-		$data_length  = $item->DATA_LENGTH;
-		$index_length = $item->INDEX_LENGTH;
-		$size_in_kb   = $data_length + $index_length;
-
-		return $this->formatSizeUnits( $size_in_kb );
-	}
-
-	/**
-	 * Format size in human readable way
-	 *
-	 * @param $bytes
-	 *
-	 * @return string
-	 */
-	private function formatSizeUnits( $bytes ) {
-		if ( $bytes >= 1073741824 ) {
-			$bytes = number_format( $bytes / ( 1024 * 1024 * 1024 ), 2 ) . ' GB';
-		} elseif ( $bytes >= 1048576 ) {
-			$bytes = number_format( $bytes / ( 1024 * 1024 ), 2 ) . ' MB';
-		} elseif ( $bytes >= 1024 ) {
-			$bytes = number_format( $bytes / 1024, 2 ) . ' KB';
-		} elseif ( $bytes > 1 ) {
-			$bytes = $bytes . ' bytes';
-		} elseif ( $bytes == 1 ) {
-			$bytes = $bytes . ' byte';
-		} else {
-			$bytes = '0 bytes';
-		}
-
-		return $bytes;
+		return size_format( $item->DATA_LENGTH + $item->INDEX_LENGTH );
 	}
 
 	/**
@@ -176,18 +107,17 @@ class TablesListTable extends WP_List_Table {
 	 * @return string
 	 */
 	public function column_actions( $item ) {
-
 		$view_url  = $this->get_action_url( array( 'tab' => 'table-data', 'table' => esc_attr( $item->TABLE_NAME ) ) );
 		$empty_url = $this->get_action_url( array(
 			'tab'    => 'tables-list',
 			'table'  => esc_attr( $item->TABLE_NAME ),
 			'action' => 'empty',
 		) );
-		$drop_url  = $this->get_action_url( array(
+		$drop_url  = $this->get_action_url( [
 			'tab'    => 'tables-list',
 			'table'  => esc_attr( $item->TABLE_NAME ),
 			'action' => 'drop',
-		) );
+		] );
 
 		//Build row actions
 		$actions          = array();
@@ -212,11 +142,11 @@ class TablesListTable extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_action_url( array $args, $page = 'tools.php' ) {
-		$defaults = array(
-			'page'  => empty( $_GET['page'] ) ? null : esc_attr( $_GET['page'] ),
-			'tab'   => empty( $_GET['tab'] ) ? null : esc_attr( $_GET['tab'] ),
-			'table' => empty( $_GET['table'] ) ? null : esc_attr( $_GET['table'] ),
-		);
+		$defaults = [
+			'page'  => $_GET['page'] ?? null,
+			'tab'   => $_GET['tab'] ?? null,
+			'table' => $_GET['table'] ?? null,
+		];
 
 		$args = wp_parse_args( $args, $defaults );
 
@@ -230,28 +160,15 @@ class TablesListTable extends WP_List_Table {
 	 * @return array
 	 */
 	public function get_bulk_actions() {
-		$actions = array(
+		return [
 			'empty' => __( 'Empty', 'textdomain' ),
 			'drop'  => __( 'Drop', 'textdomain' ),
-		);
-
-		return $actions;
+		];
 	}
 
-	/** ************************************************************************
-	 * REQUIRED! This is where you prepare your data for display. This method will
-	 * usually be used to query the database, sort and filter the data, and generally
-	 * get it ready to be displayed. At a minimum, we should set $this->items and
-	 * $this->set_pagination_args(), although the following properties and methods
-	 * are frequently interacted with here...
-	 *
-	 * @uses $this->_column_headers
-	 * @uses $this->items
-	 * @uses $this->get_columns()
-	 * @uses $this->get_sortable_columns()
-	 * @uses $this->get_pagenum()
-	 * @uses $this->set_pagination_args()
-	 **************************************************************************/
+	/**
+	 * @inheritDoc
+	 */
 	public function prepare_items( $search = null ) {
 		/**
 		 * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -271,34 +188,18 @@ class TablesListTable extends WP_List_Table {
 		 */
 		$this->process_bulk_action();
 
-		// First, lets decide how many records per page to show
-		$per_page = $this->get_items_per_page( 'wordpress_database_admin_per_page', 100 );
-		// What page the user is currently looking at
-		$current_page = $this->get_pagenum();
-
-		$args = array(
-			'orderby'  => ! empty( $_REQUEST['orderby'] ) ? $_REQUEST['orderby'] : $this->_primary_key,
-			'order'    => ! empty( $_REQUEST['order'] ) ? $_REQUEST['order'] : 'desc',
-			'offset'   => ( $current_page - 1 ) * $per_page,
-			'per_page' => $per_page,
-		);
-
 		/**
 		 * REQUIRED. Now we can add our *sorted* data to the items property, where
 		 * it can be used by the rest of the class.
 		 */
 		$this->items = json_decode( json_encode( Helper::get_database_tables_list() ) );
 
-		// Total number of items
-		$total_items = count( $this->items );
-
 		/**
 		 * REQUIRED. We also have to register our pagination options & calculations.
 		 */
 		$this->set_pagination_args( [
-			'total_items' => $total_items,
-			'per_page'    => $per_page,
-			'total_pages' => ceil( $total_items / $per_page )
+			'total_items' => count( $this->items ),
+			'per_page'    => $this->get_items_per_page( 'wordpress_database_admin_per_page', 100 ),
 		] );
 	}
 

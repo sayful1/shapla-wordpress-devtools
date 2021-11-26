@@ -14,7 +14,31 @@ class Helper {
 			DB_NAME
 		);
 
-		return $wpdb->get_results( $query, ARRAY_A );
+		$items = $wpdb->get_results( $query, ARRAY_A );
+
+		return self::sort( $items, 'TABLE_NAME' );
+	}
+
+	public static function sort( $records, $field, $reverse = false ): array {
+		$hash = [];
+
+		foreach ( $records as $record ) {
+			$hash[ $record[ $field ] ] = $record;
+		}
+
+		( $reverse ) ? krsort( $hash ) : ksort( $hash );
+
+		$records = [];
+
+		foreach ( $hash as $record ) {
+			$records [] = $record;
+		}
+
+		return $records;
+	}
+
+	public static function get_tables() {
+
 	}
 
 	public static function truncate_table( $tables ) {

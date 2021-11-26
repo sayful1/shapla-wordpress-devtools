@@ -341,22 +341,15 @@ class TableDataListTable extends WP_List_Table {
 		//Detect when a bulk action is being triggered...
 		if ( 'delete' === $this->current_action() ) {
 
-			$_primary_value = isset( $_GET[ $this->_primary_key ] ) ? $_GET[ $this->_primary_key ] : null;
+			$_primary_value = $_GET[ $this->_primary_key ] ?? null;
 
 			if ( $_primary_value ) {
 				if ( is_array( $_primary_value ) ) {
 					foreach ( $_primary_value as $id ) {
-						$wpdb->delete( $table,
-							array( $this->_primary_key => intval( $id ) ),
-							array( '%d' )
-						);
+						$wpdb->delete( $table, [ $this->_primary_key => intval( $id ) ] );
 					}
 				} else {
-					$wpdb->delete( $table, array(
-						$this->_primary_key => intval( $_primary_value )
-					),
-						array( '%d' )
-					);
+					$wpdb->delete( $table, [ $this->_primary_key => intval( $_primary_value ) ] );
 				}
 			}
 		}
